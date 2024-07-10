@@ -3,6 +3,7 @@ package main
 import (
 	"net/http"
 
+	"github.com/PedroSantiagoDev/api-students/db"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -29,5 +30,6 @@ func getStudents(c echo.Context) error {
 }
 
 func createStudents(c echo.Context) error {
+	db.AddStudent()
 	return c.String(http.StatusCreated, "Create students")
 }
