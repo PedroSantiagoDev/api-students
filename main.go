@@ -17,6 +17,7 @@ func main() {
 
 	// Routes
 	e.GET("/students", getStudents)
+	e.POST("/students", createStudents)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":8080"))
@@ -25,4 +26,8 @@ func main() {
 // Handler
 func getStudents(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, Students!")
+}
+
+func createStudents(c echo.Context) error {
+	return c.String(http.StatusCreated, "Create students")
 }
