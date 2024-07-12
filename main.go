@@ -30,6 +30,11 @@ func getStudents(c echo.Context) error {
 }
 
 func createStudents(c echo.Context) error {
-	db.AddStudent()
+	student := db.Student{}
+	if err := c.Bind(&student); err != nil {
+		return err
+	}
+
+	db.AddStudent(student)
 	return c.String(http.StatusCreated, "Create students")
 }
