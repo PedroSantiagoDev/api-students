@@ -7,6 +7,7 @@ import (
 
 	"github.com/PedroSantiagoDev/api-students/schemas"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog/log"
 	"gorm.io/gorm"
 )
 
@@ -15,19 +16,33 @@ func (api *API) getStudents(c echo.Context) error {
 	if err != nil {
 		return c.String(http.StatusNotFound, "Failed to get student")
 	}
-	return c.JSON(http.StatusOK, students)
+	listOfStudents := map[string][]schemas.StudentResponse{"students": schemas.NewResponse(students)}
+	return c.JSON(http.StatusOK, listOfStudents)
 }
 
 func (api *API) createStudent(c echo.Context) error {
-	student := schemas.Student{}
-	if err := c.Bind(&student); err != nil {
+	studentReq := StudentRequest{}
+	if err := c.Bind(&studentReq); err != nil {
 		return err
 	}
 
-	if err := api.DB.AddStudent(student); err != nil {
-		return c.String(http.StatusInternalServerError, "Error to create students")
+	if err := studentReq.Validate(); err != nil {
+		log.Error().Err(err).Msgf("[api] error validating struck")
+		return c.String(http.StatusBadRequest, "Error validated student")
 	}
-	return c.String(http.StatusCreated, "Create students")
+
+	student := schemas.Student{
+		Name:   studentReq.Name,
+		Email:  studentReq.Email,
+		CPF:    studentReq.CPF,
+		Age:    studentReq.Age,
+		Active: *studentReq.Active,
+	}
+
+	if err := api.DB.AddStudent(student); err != nil {
+		return c.String(http.StatusInternalServerError, "Error to create student")
+	}
+	return c.JSON(http.StatusCreated, student)
 }
 
 func (api *API) getStudent(c echo.Context) error {
