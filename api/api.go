@@ -29,9 +29,9 @@ func NewServer() *API {
 func (api *API) ConfigureRoutes() {
 	api.Echo.GET("/students", api.getStudents)
 	api.Echo.POST("/students", api.createStudent)
-	api.Echo.GET("/student/:id", api.getStudent)
-	api.Echo.PUT("/student/:id", api.updateStudent)
-	// api.Echo.DELETE("/student/:id", api.deleteStudent)
+	api.Echo.GET("/students/:id", api.getStudent)
+	api.Echo.PUT("/students/:id", api.updateStudent)
+	api.Echo.DELETE("/students/:id", api.deleteStudent)
 }
 
 func (api *API) Start() error {

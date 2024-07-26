@@ -2,11 +2,12 @@ package api
 
 import (
 	"errors"
+	"net/http"
+	"strconv"
+
 	"github.com/PedroSantiagoDev/api-students/db"
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
-	"net/http"
-	"strconv"
 )
 
 func (api *API) getStudents(c echo.Context) error {
@@ -84,4 +85,22 @@ func updateStudentInfo(receivedStudent, student db.Student) db.Student {
 		student.Active = receivedStudent.Active
 	}
 	return student
+}
+
+func (api *API) deleteStudent(c echo.Context) error {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to get student ID")
+	}
+	student, err := api.DB.GetStudent(id)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return c.String(http.StatusNotFound, "Student not found")
+	}
+	if err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to get student")
+	}
+	if err := api.DB.DeleteStudent(student); err != nil {
+		return c.String(http.StatusInternalServerError, "Failed to delete student")
+	}
+	return c.JSON(http.StatusOK, student)
 }
